@@ -1,0 +1,78 @@
+import barrios.*
+import elementos.*
+import plagas.*
+
+describe "test de Barrios" {
+	const hogar1 = new Hogar(nivelDeMugre=10,confort=30)
+	const huerta1 = new Huerta(produccion=800)
+	const huerta2 = new Huerta(produccion=800)
+	const huerta3 = new Huerta(produccion=1200)
+	const caniche = new Mascota(salud=200)
+	const gatoNaranja = new Mascota(salud=350)
+	const siames1 = new Mascota(salud=300)
+	const siames2 = new Mascota(salud=300)
+	const sharPei = new Mascota(salud=320)
+	const barrioNoCopado = new Barrio()
+	const barrioCopado = new Barrio()
+	const hogar2 = new Hogar(nivelDeMugre=5,confort=30)
+	const hogar3 = new Hogar(nivelDeMugre=15,confort=25)
+	const cucas1 = new Cucarachas(poblacion=10,pesoPromedioBicho=8)
+	const cucas2 = new Cucarachas(poblacion=25, pesoPromedioBicho=8)
+	const pulgas1 = new Pulgas(poblacion=15)
+	const garrapatas1 = new Garrapatas(poblacion=20)
+	const mosquitos1 = new Mosquitos(poblacion=45)
+	
+	method initialize() {
+		barrioNoCopado.agregarElementos([hogar1,huerta1,caniche])
+		barrioCopado.agregarElementos([siames1,siames2,sharPei,hogar2,huerta2,huerta3,hogar3])
+	}
+	
+	
+	test "el barrioNoCopado no es copado" {
+		assert.notThat(barrioNoCopado.esCopado())
+	}
+	
+	test "ahora el barrio no copado es copado" {
+		barrioNoCopado.agregarElementos([hogar2,gatoNaranja])
+		assert.that(barrioNoCopado.esCopado())
+	}
+	
+	test "ahora como quedan empatados no es copado" {
+		barrioNoCopado.agregarElementos([hogar2,gatoNaranja])
+		barrioNoCopado.agregarElemento(huerta2)
+		assert.notThat(barrioNoCopado.esCopado())
+	}
+	
+	test "el barrio copado es copado"{
+		assert.that(barrioCopado.esCopado())
+	}
+	
+	
+	test "hogar1 recibe ataque de cucas1 y queda con mugre 15" {
+		hogar1.recibeAtaqueDe(cucas1)
+		assert.equals(15,hogar1.nivelDeMugre())
+	}
+	
+	test "un siames es atacado por garrapatas, el otro por pulgas, quedan con 260 y 270 de salud respectivamente"{
+		siames1.recibeAtaqueDe(garrapatas1)
+		siames2.recibeAtaqueDe(pulgas1)
+		assert.equals(260, siames1.salud())
+		assert.equals(270,siames2.salud())
+	}
+	
+	test "la huerta3 es atacada por mosquitos, su producción se reduce a 1185.5"{
+		huerta3.recibeAtaqueDe(mosquitos1)
+		assert.equals(1185.5, huerta3.produccion())
+	}
+	
+	test "se construye una nueva casa en el barrio copado, pero todo el vecindario es atacado por una plaga
+			de cucarachas, el barrio pasa a ser no copado" {
+		barrioCopado.agregarElemento(hogar1)
+		hogar1.recibeAtaqueDe(cucas2)
+		hogar2.recibeAtaqueDe(cucas2)
+		hogar3.recibeAtaqueDe(cucas2)
+		
+		assert.notThat(barrioCopado.esCopado())
+	}
+		
+}
